@@ -126,18 +126,24 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 @app.route('/submit_question_and_documents', methods=['POST'])
 def submit_question_and_documents():
+    # Clear previous history
+    global current_question, current_document_urls, current_facts, current_status
+    current_question = ""
+    current_document_urls = []
+    current_facts = []
+    current_status = "processing"
+
     data = request.get_json()
     question = data['question']
     document_urls = data['documents']
-    
-    # Store the question and document URLs in a global variable or database
-    global current_question, current_document_urls
+
+    # Store the question and document URLs in global variables
     current_question = question
     current_document_urls = document_urls
-    
+
     # Start processing the documents asynchronously
     threading.Thread(target=process_documents).start()
-    
+
     return jsonify({"message": "Processing started"}), 200
 
 
@@ -150,9 +156,12 @@ def index():
 def test_submit():
     test_question = "What are our product design decisions?"
     test_document_urls = [
-        "C:/Users/16168/Documents/SideProjects/ClericTest/call_log01.txt",
-        "C:/Users/16168/Documents/SideProjects/ClericTest/call_log02.txt",
-        "C:/Users/16168/Documents/SideProjects/ClericTest/call_log03.txt"
+        "https://koernergb.github.io/pdf/call_log01.txt"
+        # "C:/Users/16168/Documents/SideProjects/ClericTest/call_log01.txt",
+        "https://koernergb.github.io/pdf/call_log02.txt"
+        # "C:/Users/16168/Documents/SideProjects/ClericTest/call_log02.txt",
+        "https://koernergb.github.io/pdf/call_log03.txt"
+        # "C:/Users/16168/Documents/SideProjects/ClericTest/call_log03.txt"
     ]
     
     global current_question, current_document_urls
