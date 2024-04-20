@@ -79,7 +79,7 @@ def extract_facts_string(question, document_content):
 
 def validate_facts_string(question, facts):
     # Validate and consolidate the extracted facts
-    prompt = f"""Given the query: {question}
+    validation_prompt = f"""Given the query: {question}
     And the following facts extracted from the documents:
     {chr(10).join(facts)}
 
@@ -91,7 +91,7 @@ def validate_facts_string(question, facts):
     a string of relevant, concise, & factual statements, with each fact separated by a new line.
     Your Answer:
     """
-    return prompt
+    return validation_prompt
 
 
 def process_documents():
@@ -189,67 +189,3 @@ def get_question_and_facts():
 if __name__ == '__main__':
     app.run()
     
-    
-    """
-    def process_documents(question, document_urls):
-    facts = []
-    
-    # Extract facts from each document
-    for url in document_urls:
-        document = fetch_document(url)
-        prompt = f"Extract facts relevant to the query: '{question}' from this document: '{document}'"
-        response = make_gpt_api_call(prompt)
-        extracted_facts = parse_response(response)
-        facts.extend(extracted_facts)
-    
-    # Validate and consolidate facts
-    response = make_gpt_api_call(prompt)
-    final_facts = parse_response(response)
-    
-    return final_facts
-    
-    
-    
-@app.route('/submit_question_and_documents', methods=['POST'])
-def submit_question_and_documents():
-    # gets a payload like:
-    '''
-    {
-      "question": "What are our product design decisions?",
-      "documents": [
-        "<https://example.com/call_log_543234.txt>",
-        "<https://example.com/call_log_65w331.txt>",
-        "<https://example.com/call_log_662x12.txt>"
-      ]
-    }
-    '''
-    data = request.get_json()
-    question = data['question']
-    document_urls = data['documents']
-    
-    # Initialize an empty list to store the extracted facts
-    extracted_facts = []
-    
-    # Process each document and extract facts
-    for url in document_urls:
-        
-        # Fetch the document content from the URL
-        document_content = fetch_document(url)
-                    
-        prompt = extract_facts_string(question, document_content)        
-        response = make_gpt_api_call(prompt)
-        facts = parse_response(response)
-        
-        # Add the extracted facts to the running list
-        extracted_facts.extend(facts)
-    
-    # Validate and consolidate the extracted facts
-    prompt = validate_facts_string(question, extracted_facts)            
-    response = make_gpt_api_call(prompt)
-    final_facts = parse_response(response)
-    
-    # Store the question and final facts in the session or database
-    # ...
-    
-    return jsonify({"message": "Processing completed"}), 200
-    """
