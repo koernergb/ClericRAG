@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fact Extraction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Fact Extraction</h1>
+    <form action="/submit_question_and_documents" method="POST">
+        <label for="question">Question:</label><br>
+        <input type="text" id="question" name="question" required><br>
+        <label for="documents">Document URLs (one per line):</label><br>
+        <textarea id="documents" name="documents" rows="5" required></textarea><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

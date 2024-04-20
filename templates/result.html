@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fact Extraction Results</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <h1>Fact Extraction Results</h1>
+    <h2>Question: {{ question }}</h2>
+    <h3>Facts:</h3>
+    <ul id="fact-list">
+        {% for fact in facts %}
+            <li>{{ fact }}</li>
+        {% endfor %}
+    </ul>
+    <p>Status: <span id="status">{{ status }}</span></p>
+    <script>
+        // Periodically update the status and facts
+        setInterval(updateResults, 5000);
+    </script>
+</body>
+</html>
