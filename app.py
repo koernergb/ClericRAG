@@ -154,22 +154,23 @@ def index():
 
 @app.route('/test_submit', methods=['GET'])
 def test_submit():
+    # Clear previous history
+    global current_question, current_document_urls, current_facts
+    current_question = ""
+    current_document_urls = []
+    current_facts = []
+
     test_question = "What are our product design decisions?"
     test_document_urls = [
-        "https://koernergb.github.io/pdf/call_log01.txt"
-        # "C:/Users/16168/Documents/SideProjects/ClericTest/call_log01.txt",
-        "https://koernergb.github.io/pdf/call_log02.txt"
-        # "C:/Users/16168/Documents/SideProjects/ClericTest/call_log02.txt",
+        "https://koernergb.github.io/pdf/call_log01.txt",
+        "https://koernergb.github.io/pdf/call_log02.txt",
         "https://koernergb.github.io/pdf/call_log03.txt"
-        # "C:/Users/16168/Documents/SideProjects/ClericTest/call_log03.txt"
     ]
-    
-    global current_question, current_document_urls
+
     current_question = test_question
     current_document_urls = test_document_urls
-    
+
     threading.Thread(target=process_documents).start()
-    
     return "Test submission started"
 
 
