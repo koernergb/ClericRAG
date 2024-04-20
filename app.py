@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import openai
 import requests
 import threading
+import streamlit as st
 
 
 # GLOBAL VARIABLES
