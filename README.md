@@ -1,6 +1,6 @@
 First, create your virtual environment:
 
-  _python -m venv env_
+  ```_python -m venv env_```
 
 Then activate the environment.
 
