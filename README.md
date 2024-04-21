@@ -1,25 +1,25 @@
 First, create your virtual environment:
 
-  ```_python -m venv env_```
+  ```python -m venv env```
 
 Then activate the environment.
 
 On Windows:
 
-_./env/Scripts/Activate.ps1_
+```./env/Scripts/Activate.ps1```
 
 On Linux:
 
-_source env/bin/activate_
+```source env/bin/activate```
 
 Then install the dependencies in the active virtual environment:
 
-_pip install -r requirements.txt_
+```pip install -r requirements.txt```
 
 You can now run the Flask app with:
 
-_python app.py_
+```python app.py```
 
 You can also run the Streamlit app with:
 
-_streamlit run streamlit_app.py_
+```streamlit run streamlitapp.py```
