@@ -22,6 +22,7 @@ def input_screen():
             st.error(f"Error submitting question and documents: {response.status_code}")
     return submit_button, question
 
+
 def output_screen(question):
     st.title("Fact Extraction App - Output Screen")
     st.write(f"Question: {question}")
@@ -38,15 +39,15 @@ def output_screen(question):
             elif data['status'] == 'done':
                 print("Processing complete, displaying facts...")
                 message.info("Processing complete")
-                facts = data['facts'].split('\n')
+                facts = data['facts']
                 for fact in facts:
-                    if fact.strip():
-                        st.write(f"• {fact.strip()}")
+                    st.write(f"• {fact.strip()}")
                 break
         else:
             print(f"Error fetching processing status: {response.status_code}")
             st.error(f"Error fetching processing status: {response.status_code}")
         time.sleep(2)
+
 
 def main():
     if 'output' not in st.session_state:

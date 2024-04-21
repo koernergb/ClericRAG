@@ -27,7 +27,7 @@ def make_gpt_api_call(prompt):
             max_tokens=200,
             n=1,
             stop=None,
-            temperature=0.4,
+            temperature=0.05,
         )
         print("Successful API call")
         return response.choices[0].message['content'].strip()
@@ -162,6 +162,29 @@ def remove_duplicates(facts_list):
     """
     de_duped = make_gpt_api_call(remove_duplicates_prompt)
     return de_duped   
+
+
+def consolidate_facts(question, fact_lists):
+    prompt = f"""
+    Given a QUERY and a list of facts, with more recent facts later in the list,
+    consolidate these facts into a single, final list of facts, considering the following:
+    - Remove any duplicate facts across the lists.
+    - If a fact from later in the list contradicts or replaces an earlier fact, keep the later fact.
+    - If a fact from later in the list provides additional information or clarification to an earlier fact, only include the later updated fact.
+
+    INSTRUCTIONS:
+    - Provide a FINAL_FACTS list with one fact per line.
+    - Each factual statement should start with a "- " (hyphen and a space) followed by a single sentence describing the fact.
+    - Do not include any additional text, formatting, or numbering in the output.
+
+    QUERY: {question}
+    FACT_LISTS:
+    {fact_lists}
+    FINAL_FACTS:
+    """
+    response = make_gpt_api_call(prompt)
+    return response.strip().split('\n')
+
    
 
 def validate_facts_string(question, current_facts, new_facts):
@@ -182,7 +205,7 @@ def validate_facts_string(question, current_facts, new_facts):
     INSTRUCTIONS:
     - Provide a short, concise list of factual statements CONSOLIDATED_FACTS with one fact per line.
     - Keep each factual statement brief and to the point and of this same format, 
-    with a "-" followed by a single factual statement sentence
+    with a "-" followed by a single factual statement sentence. Do not output markdown formatting.
     
     EXAMPLE:
     EXAMPLE_QUERY: What are our product design decisions?
@@ -190,7 +213,7 @@ def validate_facts_string(question, current_facts, new_facts):
     - The team has decided to use a responsive design to ensure the product works well on all devices.
     - The team has decided to provide both dark and light theme options for the user interface.
     EXAMPLE_NEW_FACTS:
-    - The team has decided to focus on a desktop-first approach for the product.
+    - The team has decided to focus on a desktop-first approach instead of responsive design for the product.
     EXAMPLE_CONSOLIDATED_FACTS:
     - The team has decided to focus on a desktop-first approach for the product.
     - The team has decided to provide both dark and light theme options for the user interface.
@@ -206,38 +229,76 @@ def validate_facts_string(question, current_facts, new_facts):
 
 
 
+
+def format_consolidated_facts(summary):
+    prompt = f"""
+    You have been provided with a summary of facts about the contents of documents.
+    The latest, most recent, subsequent facts are true.
+    Your task is to convert this summary into a list of the latest true concise factual statements, with one fact per line, in the following format:
+
+    - [Factual statement]
+    
+    Here's an example of output in the desired format:
+    - The team has decided to focus on a desktop-first approach for the product.
+    - The team has decided to provide both dark and light theme options for the user interface.
+
+    Each fact should be a single sentence, starting with a hyphen followed by a space, and should not include any additional formatting or numbering.
+
+    Here is the summary:
+
+    {summary}
+
+    Please provide the list of facts in the desired format:
+    """
+    
+    response = make_gpt_api_call(prompt)
+    return response.strip()
+
+
 def process_documents():
     
     global current_question, current_document_urls, current_facts, current_status
-    
+
     current_facts = []
-    
+
     for url in current_document_urls:
         document_content = fetch_document(url)
         prompt = extract_facts_string(current_question, document_content)
-        print("Preparing to call GPT API")        
+        print("Preparing to call GPT API")
         response = make_gpt_api_call(prompt)
         print("Called GPT API")
         new_facts = parse_response(response)
-        print(response)
-        
-        prompt = validate_facts_string(current_question, current_facts, new_facts) 
-        print("Preparing to make GPT validation call")
-        response = make_gpt_api_call(prompt)
-        print("Made GPT API call for validation.")           
-        current_facts = parse_response(response)
-        print(response)
+        print("Facts: \n" + response)
+
+        # Instead of validating the facts immediately, append them to the current_facts list
+        current_facts.extend(new_facts)
+        print(f"Current Facts:")
         time.sleep(5)
+
+    # After processing all documents, validate the consolidated list of facts
+    facts = consolidate_facts(current_question, [current_facts])
+    print("Consolidated facts:\n" + "\n".join(facts))
     
-    # read all documents, convert current facts formatting
-    # remove duplicates from facts list
+    # prompt = validate_facts_string(current_question, [], current_facts)
+    # print("Preparing to make GPT validation call")
+    # response = make_gpt_api_call(prompt)
+    # print("Made GPT API call for validation.")
     
-    formatted_output_prompt = convert_output_formatting(current_facts)
-    print("Preparing final formatting API call")
-    current_facts = make_gpt_api_call(formatted_output_prompt)
-    print(f"Formatting API call completed, here's the result:\n {current_facts}")
-    # current_facts = remove_duplicates(current_facts)
-    # print("We've removed duplicates, here's the final result: \n" + current_facts)
+    # current_facts = parse_response(response)
+    # print(response)
+    
+    formatted_facts = format_consolidated_facts(facts)
+    print(formatted_facts)
+    current_facts = formatted_facts.split('\n')
+
+    # Format the output and remove duplicates
+    # formatted_output_prompt = convert_output_formatting('\n'.join(current_facts))
+    # print("Preparing final formatting API call")
+    # current_facts = parse_response(make_gpt_api_call(formatted_output_prompt))
+    # print(f"Formatting API call completed, here's the result: \n {current_facts}")
+    # current_facts = parse_response(remove_duplicates(current_facts))
+    # print(f"We've removed duplicates, here's the final result: \n {current_facts}")
+
     current_status = "done"
     print("current status should be updated to done")
 
