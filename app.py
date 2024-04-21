@@ -157,7 +157,7 @@ def consolidate_facts(question, fact_lists):
     """
     response = make_gpt_api_call(prompt)
     response = parse_response(response)
-    return response.strip().split('\n')
+    return response
 
 
 
@@ -183,7 +183,7 @@ def format_consolidated_facts(summary):
     """
     response = make_gpt_api_call(prompt)
     response = parse_response(response)
-    return response.strip()
+    return response
 
 
 
@@ -197,7 +197,8 @@ def process_documents():
         
         document_content = fetch_document(url)
         new_facts = extract_facts(current_question, document_content)
-        print("Facts: \n" + new_facts)
+        print("Facts: \n")
+        print(new_facts)
         current_facts.extend(new_facts)
         time.sleep(5)
 
@@ -207,7 +208,7 @@ def process_documents():
     
     formatted_facts = format_consolidated_facts(facts)
     print(f"Formatted facts: \n {formatted_facts}")
-    current_facts = formatted_facts.split('\n')
+    current_facts = formatted_facts
 
     current_status = "done"
     print("current status should be updated to done")
@@ -225,7 +226,6 @@ def index():
 @app.route('/submit_question_and_documents', methods=['POST'])
 @cross_origin()
 def submit_question_and_documents():
-    
     print("Received request at /submit_question_and_documents")
     # Clear previous history
     global current_question, current_document_urls, current_facts, current_status
@@ -252,7 +252,6 @@ def submit_question_and_documents():
 @app.route('/get_question_and_facts', methods=['GET'])
 @cross_origin()
 def get_question_and_facts():
-    
     print("Entered /get_question_and_facts")
     global current_question, current_facts, current_status
     
