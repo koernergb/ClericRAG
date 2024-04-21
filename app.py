@@ -197,7 +197,7 @@ def process_documents():
         
         document_content = fetch_document(url)
         new_facts = extract_facts(current_question, document_content)
-        print("Facts: \n")
+        print("Extracted facts: \n")
         print(new_facts)
         current_facts.extend(new_facts)
         time.sleep(3)
@@ -207,7 +207,7 @@ def process_documents():
     print("Consolidated facts:\n" + "\n".join(facts))
     
     formatted_facts = format_consolidated_facts(facts)
-    print(f"Formatted facts: \n {formatted_facts}")
+    print("Formatted facts:\n" + "\n".join(formatted_facts))
     current_facts = formatted_facts
 
     current_status = "done"
@@ -241,6 +241,7 @@ def submit_question_and_documents():
 
         # Check if 'question' and 'documents' keys exist in the JSON data
         if 'question' not in data or 'documents' not in data:
+            print("Missing required question and document keys in request")
             return jsonify({"error": "Missing 'question' or 'documents' key in JSON data"}), 400
 
         question = data['question']
