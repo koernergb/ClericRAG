@@ -200,7 +200,7 @@ def process_documents():
         print("Facts: \n")
         print(new_facts)
         current_facts.extend(new_facts)
-        time.sleep(5)
+        time.sleep(3)
 
     # After processing all documents, validate the consolidated list of facts
     facts = consolidate_facts(current_question, [current_facts])
@@ -226,26 +226,39 @@ def index():
 @app.route('/submit_question_and_documents', methods=['POST'])
 @cross_origin()
 def submit_question_and_documents():
-    print("Received request at /submit_question_and_documents")
-    # Clear previous history
-    global current_question, current_document_urls, current_facts, current_status
-    current_question = ""
-    current_document_urls = []
-    current_facts = []
-    current_status = "processing"
+    
+    try:
+        
+        print("Received request at /submit_question_and_documents")
+        # Clear previous history
+        global current_question, current_document_urls, current_facts, current_status
+        current_question = ""
+        current_document_urls = []
+        current_facts = []
+        current_status = "processing"
 
-    data = request.get_json()
-    question = data['question']
-    document_urls = data['documents']
+        data = request.get_json()
 
-    # Store the question and document URLs in global variables
-    current_question = question
-    current_document_urls = document_urls
+        # Check if 'question' and 'documents' keys exist in the JSON data
+        if 'question' not in data or 'documents' not in data:
+            return jsonify({"error": "Missing 'question' or 'documents' key in JSON data"}), 400
 
-    # Start processing the documents asynchronously
-    threading.Thread(target=process_documents).start()
+        question = data['question']
+        document_urls = data['documents']
 
-    return jsonify({"message": "Processing started"}), 200
+        # Store the question and document URLs in global variables
+        current_question = question
+        current_document_urls = document_urls
+
+        # Start processing the documents asynchronously
+        threading.Thread(target=process_documents).start()
+
+        return jsonify({"message": "Processing started"}), 200
+
+    except Exception as e:
+        
+        print(f"Error in submit_question_and_documents: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
 
 
