@@ -319,6 +319,7 @@ def process_documents():
 @app.route('/submit_question_and_documents', methods=['POST'])
 @cross_origin()
 def submit_question_and_documents():
+    print("Received request at /submit_question_and_documents")
     # Clear previous history
     global current_question, current_document_urls, current_facts, current_status
     current_question = ""
@@ -371,6 +372,7 @@ def test_submit():
 @app.route('/get_question_and_facts', methods=['GET'])
 @cross_origin()
 def get_question_and_facts():
+    print("Entered /get_question_and_facts")
     global current_question, current_facts, current_status
     
     response = {
