@@ -7,7 +7,7 @@ import openai
 import requests
 import threading
 import streamlit as st
-from flask_cors import CORS  # Import the CORS extension
+from flask_cors import CORS, cross_origin  # Import the CORS extension
 
 
 # GLOBAL VARIABLES
