@@ -7,6 +7,7 @@ import openai
 import requests
 import threading
 import streamlit as st
+from flask_cors import CORS  # Import the CORS extension
 
 
 # GLOBAL VARIABLES
@@ -15,7 +16,17 @@ current_document_urls = []
 current_facts = []
 current_status = "processing"
 
+# SET UP FLASK & GPT API
+# Load environment variables from .env file
+load_dotenv()
+# Set up OpenAI API key
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes and origins
+
+
+# HELPER FUNCTIONS
 def make_gpt_api_call(prompt):
     try:
         response = openai.ChatCompletion.create(
@@ -304,16 +315,9 @@ def process_documents():
 
 
 
-# SET UP FLASK & GPT API
-# Load environment variables from .env file
-load_dotenv()
-
-app = Flask(__name__)
-
-# Set up OpenAI API key
-openai.api_key = os.environ["OPENAI_API_KEY"]
 
 @app.route('/submit_question_and_documents', methods=['POST'])
+@cross_origin()
 def submit_question_and_documents():
     # Clear previous history
     global current_question, current_document_urls, current_facts, current_status
@@ -365,6 +369,7 @@ def test_submit():
 
 
 @app.route('/get_question_and_facts', methods=['GET'])
+@cross_origin()
 def get_question_and_facts():
     global current_question, current_facts, current_status
     

@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import time
 
-FLASK_API_URL = "http://localhost:5000"
+FLASK_API_URL = "https://clericrag.onrender.com"
 
 def input_screen():
     st.title("Fact Extraction App - Input Screen")
